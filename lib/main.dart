@@ -68,10 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Stack(
                     children: [
                       Center(child: Text("2 January 2024")),
-                      Placeholder(
-                        fallbackHeight: 200,
-                        fallbackWidth: 300,
-                      ),
+                      // Idea: add a plant that grows with consistent usage of the app
+                      // Image.asset('assets/images/plant.png'),
                     ],
                   ),
                   TaskEntry(),
