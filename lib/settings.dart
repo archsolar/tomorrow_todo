@@ -15,8 +15,11 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(),
+      ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 20.0), // adjust the value as needed
+        padding: const EdgeInsets.only(top: 0.0), // adjust the value as needed
         child: ListView(
           children: <Widget>[
             ListTile(

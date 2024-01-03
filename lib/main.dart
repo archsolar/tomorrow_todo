@@ -72,13 +72,15 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView(
                 children: [
                   // Idea an animation of a plant that slowly grows with consistent usage of the app
+                  // Idea or a star for each time you finished all the tasks.
+                  // Allow the user to admit they lied, and remove stars.
                   Stack(
                     children: [
                       Container(
                           color: Theme.of(context).colorScheme.inversePrimary,
-                          child: const Center(
-                              child: Text(
-                                  "2 January 2024"))), // It either reads {today's date} or "Tomorrow"
+                          child: const Center(child: Text(
+                              // Idea: replace with some kind digital date?
+                              "2 January 2024"))), // It either reads {today's date} or "Tomorrow"
                       // Idea: add a plant that grows with consistent usage of the app
                       // Image.asset('assets/images/plant.png'),
                     ],
