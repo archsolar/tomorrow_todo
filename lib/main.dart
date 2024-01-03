@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tomorrow_todo/settings.dart';
 
 // Idea: check if there are user settings available else fall back to this
@@ -9,7 +11,7 @@ TextTheme getTextTheme() {
 }
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
