@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tomorrow_todo/settings.dart';
 
 // Idea: check if there are user settings available else fall back to this
-TextTheme defaultTextTheme() {
+TextTheme getTextTheme() {
   return const TextTheme(
     bodyMedium: TextStyle(fontSize: 25.0),
   );
@@ -20,10 +21,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.light,
-        textTheme: defaultTextTheme(),
+        textTheme: getTextTheme(),
       ),
       darkTheme:
-          ThemeData(brightness: Brightness.dark, textTheme: defaultTextTheme()),
+          ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       // Idea: replace
@@ -50,9 +51,15 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 1,
-                child: Text("Settings"),
+                child: const Text("Settings"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Settings()),
+                  );
+                },
               ),
             ],
           ),
@@ -63,16 +70,20 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Expanded(
               child: ListView(
-                children: const [
+                children: [
                   // Idea an animation of a plant that slowly grows with consistent usage of the app
                   Stack(
                     children: [
-                      Center(child: Text("2 January 2024")),
+                      Container(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          child: const Center(
+                              child: Text(
+                                  "2 January 2024"))), // It either reads {today's date} or "Tomorrow"
                       // Idea: add a plant that grows with consistent usage of the app
                       // Image.asset('assets/images/plant.png'),
                     ],
                   ),
-                  TaskEntry(),
+                  const TaskEntry(),
                 ],
               ),
             ),
@@ -114,8 +125,10 @@ class _TaskEntryState extends State<TaskEntry> {
       return Colors.red;
     }
 
+    const imageScaleDivisor = 14.0;
     return Row(
       children: [
+        // Idea: different color checkbox when holding
         Checkbox(
           checkColor: Colors.white,
           fillColor: MaterialStateProperty.resolveWith(getColor),
@@ -127,7 +140,22 @@ class _TaskEntryState extends State<TaskEntry> {
           },
         ),
         Expanded(child: Text(taskName)),
-        const Icon(Icons.arrow_forward), // Add this line
+        GestureDetector(
+          onTap: () {
+            print("Idea: navigate to the next day");
+          },
+          child: Padding(
+            padding:
+                const EdgeInsets.only(right: 8.0), // adjust the value as needed
+            child: Transform.scale(
+              scale: DefaultTextStyle.of(context).style.fontSize != null
+                  ? DefaultTextStyle.of(context).style.fontSize! /
+                      imageScaleDivisor
+                  : 18.0 / imageScaleDivisor,
+              child: const Icon(Icons.play_arrow),
+            ),
+          ),
+        ),
       ],
     );
   }
