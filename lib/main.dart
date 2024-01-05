@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tomorrow_todo/settings.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'darkModeProvider.dart';
 
 // Idea: check if there are user settings available else fall back to this
 TextTheme getTextTheme() {
@@ -14,11 +15,18 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+ThemeMode getThemeMode() {
+  // Idea: check if there are user settings available else fall back to this
+  return ThemeMode.system;
+}
+
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var darkMode = ref.watch(darkModeProvider);
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -27,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
-      themeMode: ThemeMode.system,
+      themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
       debugShowCheckedModeBanner: false,
       // Idea: replace
       home: const MyHomePage(title: 'Tomorrow TODO'),
@@ -82,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Theme.of(context).colorScheme.inversePrimary,
                           child: const Center(child: Text(
                               // Idea: replace with some kind digital date?
-                              "2 January 2024"))), // It either reads {today's date} or "Tomorrow"
+                              "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
                       // Idea: add a plant that grows with consistent usage of the app
                       // Image.asset('assets/images/plant.png'),
                     ],

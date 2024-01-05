@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tomorrow_todo/darkModeProvider.dart';
 
-class Settings extends StatefulWidget {
-  Settings({Key? key}) : super(key: key);
-
-  @override
-  _SettingsState createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  bool _darkMode = false;
+class Settings extends ConsumerWidget {
   String _fontFamily = 'Roboto';
   double _fontSize = 14.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var darkMode = ref.watch(darkModeProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),
@@ -25,11 +21,9 @@ class _SettingsState extends State<Settings> {
             ListTile(
               title: const Text('Dark mode'),
               trailing: Switch(
-                value: _darkMode,
+                value: darkMode,
                 onChanged: (value) {
-                  setState(() {
-                    _darkMode = value;
-                  });
+                  ref.read(darkModeProvider.notifier).toggle();
                 },
               ),
             ),
@@ -52,9 +46,9 @@ class _SettingsState extends State<Settings> {
                   ),
                 ],
                 onChanged: (double? newValue) {
-                  setState(() {
-                    _fontSize = newValue!;
-                  });
+                  // setState(() {
+                  //   _fontSize = newValue!;
+                  // });
                 },
               ),
             ),
@@ -77,9 +71,9 @@ class _SettingsState extends State<Settings> {
                   ),
                 ],
                 onChanged: (String? newValue) {
-                  setState(() {
-                    _fontFamily = newValue!;
-                  });
+                  // setState(() {
+                  //   _fontFamily = newValue!;
+                  // });
                 },
               ),
             ),
