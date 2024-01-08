@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-
 import 'stored_structs.dart';
 
 /// Database control panel.
@@ -13,17 +11,28 @@ class Database {
 
   // Initialize database
   static Future<void> init() async {
-    final app_dir = await getApplicationDocumentsDirectory();
-    print(app_dir.path);
-    // final dir = Directory(p.join(app_dir.path, '/tomorrow'));
+    final appDir = await getApplicationDocumentsDirectory();
 
     // Ensure the directory exists
-    if (!await app_dir.exists()) {
-      await app_dir.create();
+    if (!await appDir.exists()) {
+      await appDir.create();
     }
+
+    String path = appDir.path;
+    // If the operating system is Windows, change the directory
+    if (Platform.isWindows) {
+      path = '${appDir.path}\\tomorrow_todo';
+      final customDir = Directory(path);
+
+      // Ensure the directory exists
+      if (!await customDir.exists()) {
+        await customDir.create();
+      }
+    }
+
     isar = await Isar.open(
       [PreferenceSchema, TaskSchema],
-      directory: app_dir.path,
+      directory: path,
     );
   }
 
