@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:tomorrow_todo/components/database.dart';
+import 'package:tomorrow_todo/components/stored_structs.dart';
 import 'package:tomorrow_todo/settings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'darkModeProvider.dart';
@@ -11,7 +13,15 @@ TextTheme getTextTheme() {
   );
 }
 
-void main() {
+final taskProvider = FutureProvider<List<Task>>((ref) async {
+  return await Database.getAllTasks();
+});
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Database.init();
+
+  await Database.insertTask("Test task");
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -78,26 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           children: [
+            Container(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                child: const Center(child: Text(
+                    // Idea: replace with some kind digital date?
+                    "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
             Expanded(
-              child: ListView(
-                children: [
-                  // Idea an animation of a plant that slowly grows with consistent usage of the app
-                  // Idea or a star for each time you finished all the tasks.
-                  // Allow the user to admit they lied, and remove stars.
-                  Stack(
-                    children: [
-                      Container(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                          child: const Center(child: Text(
-                              // Idea: replace with some kind digital date?
-                              "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
-                      // Idea: add a plant that grows with consistent usage of the app
-                      // Image.asset('assets/images/plant.png'),
-                    ],
-                  ),
-                  const TaskEntry(),
-                ],
-              ),
+              child: TaskViewer(),
             ),
             const TextField(
               decoration: InputDecoration(
@@ -112,16 +109,53 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class TaskViewer extends StatelessWidget {
+  TaskViewer({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tasks = Database.getAllTasks();
+
+    return FutureBuilder<List<Task>>(
+      future: tasks,
+      builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(); // Show a loading spinner while waiting
+        } else if (snapshot.hasError) {
+          return Text(
+              'Error: ${snapshot.error}'); // Show error if something went wrong
+        } else if (snapshot.data == null) {
+          return Text("Wait for tomorrow/Something went wrong :)");
+        } else {
+          // Build the ListView with the data from snapshot
+          return ListView(
+            children: snapshot.data!.map((Task task) {
+              return TaskEntry(
+                task: task,
+              );
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
+}
+
+// TODO what does this mean?
+// ignore: must_be_immutable
 class TaskEntry extends StatefulWidget {
-  const TaskEntry({super.key});
+  Task task;
+  TaskEntry({super.key, required this.task});
 
   @override
   State<TaskEntry> createState() => _TaskEntryState();
 }
 
 class _TaskEntryState extends State<TaskEntry> {
-  bool isChecked = false;
-  String taskName = "Add task(s) for tomorrow";
+  // bool isChecked = false;
+  // String taskName = widget.task.title;
 
   @override
   Widget build(BuildContext context) {
@@ -137,37 +171,37 @@ class _TaskEntryState extends State<TaskEntry> {
       return Colors.red;
     }
 
-    const imageScaleDivisor = 14.0;
     return Row(
       children: [
         // Idea: different color checkbox when holding
         Checkbox(
           checkColor: Colors.white,
           fillColor: MaterialStateProperty.resolveWith(getColor),
-          value: isChecked,
+          value: widget.task.done,
           onChanged: (bool? value) {
             setState(() {
-              isChecked = value!;
+              Database.toggleDone(widget.task);
             });
           },
         ),
-        Expanded(child: Text(taskName)),
-        GestureDetector(
-          onTap: () {
-            print("Idea: navigate to the next day");
-          },
-          child: Padding(
-            padding:
-                const EdgeInsets.only(right: 8.0), // adjust the value as needed
-            child: Transform.scale(
-              scale: DefaultTextStyle.of(context).style.fontSize != null
-                  ? DefaultTextStyle.of(context).style.fontSize! /
-                      imageScaleDivisor
-                  : 18.0 / imageScaleDivisor,
-              child: const Icon(Icons.play_arrow),
-            ),
-          ),
-        ),
+        Expanded(child: Text(widget.task.title)),
+        // if (tomorrowTask) //TODO only show this when it's the tomorrow task.
+        //   GestureDetector(
+        //     onTap: () {
+        //       print("Idea: navigate to the next day");
+        //     },
+        //     child: Padding(
+        //       padding: const EdgeInsets.only(
+        //           right: 8.0), // adjust the value as needed
+        //       child: Transform.scale(
+        //         scale: DefaultTextStyle.of(context).style.fontSize != null
+        //             ? DefaultTextStyle.of(context).style.fontSize! /
+        //                 imageScaleDivisor
+        //             : 18.0 / imageScaleDivisor,
+        //         child: const Icon(Icons.play_arrow),
+        //       ),
+        //     ),
+        //   ),
       ],
     );
   }
