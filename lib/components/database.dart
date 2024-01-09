@@ -84,7 +84,8 @@ class Database {
       final success = await isar.tasks.delete(taskId);
       // Idea replace with onscreen alert.
       if (!success) {
-        throw Exception("Failed to delete task, please contact Developer");
+        // Do nothing
+        // throw Exception("Failed to delete task, please contact Developer");
       }
     });
   }
