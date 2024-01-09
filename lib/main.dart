@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Center(child: Text(
                     // Idea: replace with some kind digital date?
                     "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
-            Expanded(
+            const Expanded(
               child: TaskViewer(),
             ),
             const TextField(
@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class TaskViewer extends StatefulWidget {
-  TaskViewer({Key? key}) : super(key: key);
+  const TaskViewer({Key? key}) : super(key: key);
 
   @override
   _TaskViewerState createState() => _TaskViewerState();
@@ -134,7 +134,7 @@ class _TaskViewerState extends State<TaskViewer> {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.data == null) {
-          return Text("Wait for tomorrow/Something went wrong :)");
+          return const Text("Wait for tomorrow/Something went wrong :)");
         } else {
           return ListView(
             children: snapshot.data!.map((Task task) {
@@ -154,15 +154,14 @@ class TaskEntry extends StatefulWidget {
   final Task task;
   final Function onUpdate;
 
-  const TaskEntry({Key? key, required this.task, required this.onUpdate})
-      : super(key: key);
+  const TaskEntry({super.key, required this.task, required this.onUpdate});
 
   @override
   State<TaskEntry> createState() => _TaskEntryState();
 }
 
 class _TaskEntryState extends State<TaskEntry> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -189,14 +188,14 @@ class _TaskEntryState extends State<TaskEntry> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Edit Task'),
+            title: const Text('Edit Task'),
             content: TextField(
               controller: _controller,
-              decoration: InputDecoration(labelText: 'Task title'),
+              decoration: const InputDecoration(labelText: 'Task title'),
             ),
             actions: [
               TextButton(
-                child: Text('Save'),
+                child: const Text('Save'),
                 onPressed: () {
                   setState(() {
                     Database.changeTaskTitle(widget.task, _controller.text);
@@ -205,8 +204,7 @@ class _TaskEntryState extends State<TaskEntry> {
                 },
               ),
               TextButton(
-                //TODO something's weird here.
-                child: Text('Delete'),
+                child: const Text('Delete'),
                 onPressed: () {
                   Database.deleteTask(widget.task.id).then((value) {
                     widget.onUpdate();
