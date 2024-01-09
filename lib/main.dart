@@ -5,6 +5,7 @@ import 'package:tomorrow_todo/components/stored_structs.dart';
 import 'package:tomorrow_todo/settings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'darkModeProvider.dart';
+// import 'package:simple_permissions/simple_permissions.dart';
 
 // Idea: check if there are user settings available else fall back to this
 TextTheme getTextTheme() {
@@ -109,10 +110,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class TaskViewer extends StatelessWidget {
-  TaskViewer({
-    super.key,
-  });
+class TaskViewer extends StatefulWidget {
+  TaskViewer({Key? key}) : super(key: key);
+
+  @override
+  _TaskViewerState createState() => _TaskViewerState();
+}
+
+class _TaskViewerState extends State<TaskViewer> {
+  void updateState() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,18 +130,17 @@ class TaskViewer extends StatelessWidget {
       future: tasks,
       builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(); // Show a loading spinner while waiting
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          return Text(
-              'Error: ${snapshot.error}'); // Show error if something went wrong
+          return Text('Error: ${snapshot.error}');
         } else if (snapshot.data == null) {
           return Text("Wait for tomorrow/Something went wrong :)");
         } else {
-          // Build the ListView with the data from snapshot
           return ListView(
             children: snapshot.data!.map((Task task) {
               return TaskEntry(
                 task: task,
+                onUpdate: updateState,
               );
             }).toList(),
           );
@@ -143,19 +150,25 @@ class TaskViewer extends StatelessWidget {
   }
 }
 
-// TODO what does this mean?
-// ignore: must_be_immutable
 class TaskEntry extends StatefulWidget {
-  Task task;
-  TaskEntry({super.key, required this.task});
+  final Task task;
+  final Function onUpdate;
+
+  const TaskEntry({Key? key, required this.task, required this.onUpdate})
+      : super(key: key);
 
   @override
   State<TaskEntry> createState() => _TaskEntryState();
 }
 
 class _TaskEntryState extends State<TaskEntry> {
-  // bool isChecked = false;
-  // String taskName = widget.task.title;
+  TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.task.title;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,38 +184,55 @@ class _TaskEntryState extends State<TaskEntry> {
       return Colors.red;
     }
 
-    return Row(
-      children: [
-        // Idea: different color checkbox when holding
-        Checkbox(
-          checkColor: Colors.white,
-          fillColor: MaterialStateProperty.resolveWith(getColor),
-          value: widget.task.done,
-          onChanged: (bool? value) {
-            setState(() {
-              Database.toggleDone(widget.task);
-            });
-          },
-        ),
-        Expanded(child: Text(widget.task.title)),
-        // if (tomorrowTask) //TODO only show this when it's the tomorrow task.
-        //   GestureDetector(
-        //     onTap: () {
-        //       print("Idea: navigate to the next day");
-        //     },
-        //     child: Padding(
-        //       padding: const EdgeInsets.only(
-        //           right: 8.0), // adjust the value as needed
-        //       child: Transform.scale(
-        //         scale: DefaultTextStyle.of(context).style.fontSize != null
-        //             ? DefaultTextStyle.of(context).style.fontSize! /
-        //                 imageScaleDivisor
-        //             : 18.0 / imageScaleDivisor,
-        //         child: const Icon(Icons.play_arrow),
-        //       ),
-        //     ),
-        //   ),
-      ],
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Edit Task'),
+            content: TextField(
+              controller: _controller,
+              decoration: InputDecoration(labelText: 'Task title'),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Save'),
+                onPressed: () {
+                  setState(() {
+                    Database.changeTaskTitle(widget.task, _controller.text);
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                //TODO something's weird here.
+                child: Text('Delete'),
+                onPressed: () {
+                  Database.deleteTask(widget.task.id).then((value) {
+                    widget.onUpdate();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+      child: Row(
+        children: [
+          Checkbox(
+            checkColor: Colors.white,
+            fillColor: MaterialStateProperty.resolveWith(getColor),
+            value: widget.task.done,
+            onChanged: (bool? value) {
+              setState(() {
+                Database.toggleDone(widget.task);
+              });
+            },
+          ),
+          Expanded(child: Text(widget.task.title)),
+        ],
+      ),
     );
   }
 }
