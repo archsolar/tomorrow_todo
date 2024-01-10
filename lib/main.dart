@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/components/stored_structs.dart';
 import 'package:tomorrow_todo/settings.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'darkModeProvider.dart';
 // import 'package:simple_permissions/simple_permissions.dart';
 
@@ -21,8 +20,8 @@ final taskProvider = FutureProvider<List<Task>>((ref) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
-
   await Database.insertTask("Test task");
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -46,29 +45,35 @@ class MyApp extends ConsumerWidget {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
-      themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: darkMode == null
+          ? ThemeMode.system
+          : (darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
       // Idea: replace
-      home: const MyHomePage(title: 'Tomorrow TODO'),
+      home: MyHomePage(title: 'Tomorrow TODO'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+// class MyHomePage extends StatefulWidget {
+//   const MyHomePage({super.key, required this.title});
+//   final String title;
+
+//   @override
+//   State<MyHomePage> createState() => _MyHomePageState();
+// }
+
+class MyHomePage extends ConsumerWidget {
   final String title;
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+  MyHomePage({super.key, required this.title});
 
-class _MyHomePageState extends State<MyHomePage> {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(title),
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) => [
@@ -76,6 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 value: 1,
                 child: const Text("Settings"),
                 onTap: () {
+                  final Brightness brightnessValue =
+                      MediaQuery.of(context).platformBrightness;
+                  ref
+                      .read(darkModeProvider.notifier)
+                      .set(brightnessValue == Brightness.dark);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Settings()),
