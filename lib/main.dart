@@ -20,9 +20,13 @@ final taskProvider = FutureProvider<List<Task>>((ref) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
+  final preference = await Database.tryGetPreferences();
   await Database.insertTask("Test task");
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(ProviderScope(
+      child: MyApp(
+    preference: preference,
+  )));
 }
 
 ThemeMode getThemeMode() {
@@ -31,12 +35,11 @@ ThemeMode getThemeMode() {
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
-
+  const MyApp({super.key, required this.preference});
+  final Preference? preference;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var darkMode = ref.watch(darkModeProvider);
-
+    var preference = ref.watch(preferenceProvider);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -45,12 +48,12 @@ class MyApp extends ConsumerWidget {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
-      themeMode: darkMode == null
+      themeMode: preference == null
           ? ThemeMode.system
-          : (darkMode ? ThemeMode.dark : ThemeMode.light),
+          : (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
       // Idea: replace
-      home: MyHomePage(title: 'Tomorrow TODO'),
+      home: const HomePage(title: 'Tomorrow TODO'),
     );
   }
 }
@@ -63,10 +66,10 @@ class MyApp extends ConsumerWidget {
 //   State<MyHomePage> createState() => _MyHomePageState();
 // }
 
-class MyHomePage extends ConsumerWidget {
+class HomePage extends ConsumerWidget {
   final String title;
 
-  MyHomePage({super.key, required this.title});
+  const HomePage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,9 +86,11 @@ class MyHomePage extends ConsumerWidget {
                 onTap: () {
                   final Brightness brightnessValue =
                       MediaQuery.of(context).platformBrightness;
+                  // Set value of darkmode.
                   ref
-                      .read(darkModeProvider.notifier)
-                      .set(brightnessValue == Brightness.dark);
+                      .read(preferenceProvider.notifier)
+                      .setDarkMode(brightnessValue == Brightness.dark);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Settings()),
@@ -121,13 +126,13 @@ class MyHomePage extends ConsumerWidget {
 }
 
 class TaskViewer extends StatefulWidget {
-  const TaskViewer({Key? key}) : super(key: key);
+  const TaskViewer({super.key});
 
   @override
-  _TaskViewerState createState() => _TaskViewerState();
+  TaskViewerState createState() => TaskViewerState();
 }
 
-class _TaskViewerState extends State<TaskViewer> {
+class TaskViewerState extends State<TaskViewer> {
   void updateState() {
     setState(() {});
   }

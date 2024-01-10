@@ -8,7 +8,8 @@ class Settings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var darkMode = ref.watch(darkModeProvider);
+    // Query whether darkmode is on
+    var preference = ref.watch(preferenceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,9 +22,9 @@ class Settings extends ConsumerWidget {
             ListTile(
               title: const Text('Dark mode'),
               trailing: Switch(
-                value: darkMode,
+                value: preference.darkMode,
                 onChanged: (value) {
-                  ref.read(darkModeProvider.notifier).toggle();
+                  ref.read(preferenceProvider.notifier).toggleDarkMode();
                 },
               ),
             ),
@@ -31,18 +32,18 @@ class Settings extends ConsumerWidget {
               title: const Text('Font size'),
               trailing: DropdownButton<double>(
                 value: _fontSize,
-                items: <DropdownMenuItem<double>>[
+                items: const <DropdownMenuItem<double>>[
                   DropdownMenuItem<double>(
                     value: 14.0,
-                    child: const Text('14'),
+                    child: Text('14'),
                   ),
                   DropdownMenuItem<double>(
                     value: 18.0,
-                    child: const Text('18'),
+                    child: Text('18'),
                   ),
                   DropdownMenuItem<double>(
                     value: 22.0,
-                    child: const Text('22'),
+                    child: Text('22'),
                   ),
                 ],
                 onChanged: (double? newValue) {
@@ -56,18 +57,18 @@ class Settings extends ConsumerWidget {
               title: const Text('Font type'),
               trailing: DropdownButton<String>(
                 value: _fontFamily,
-                items: <DropdownMenuItem<String>>[
+                items: const <DropdownMenuItem<String>>[
                   DropdownMenuItem<String>(
                     value: 'Roboto',
-                    child: const Text('Roboto'),
+                    child: Text('Roboto'),
                   ),
                   DropdownMenuItem<String>(
                     value: 'Arial',
-                    child: const Text('Arial'),
+                    child: Text('Arial'),
                   ),
                   DropdownMenuItem<String>(
                     value: 'Courier',
-                    child: const Text('Courier'),
+                    child: Text('Courier'),
                   ),
                 ],
                 onChanged: (String? newValue) {

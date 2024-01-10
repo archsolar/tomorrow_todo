@@ -1,13 +1,25 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// ignore_for_file: file_names
 
-class DarkModeNotifier extends StateNotifier<bool> {
-  DarkModeNotifier() : super(false);
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-  void toggle() {
-    state = !state;
+import 'components/stored_structs.dart';
+
+class PreferenceNotifier extends Notifier<Preference> {
+  @override
+  Preference build() => Preference();
+
+  void toggleDarkMode() {
+    state = Preference()..darkMode = !state.darkMode;
   }
+
+  void setDarkMode(bool value) {
+    state = Preference()..darkMode = value;
+  }
+
+  // void set(Preference newState) {
+  //   state = newState;
+  // }
 }
 
-final darkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>(
-  (ref) => DarkModeNotifier(),
-);
+final preferenceProvider =
+    NotifierProvider<PreferenceNotifier, Preference>(PreferenceNotifier.new);
