@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/components/stored_structs.dart';
@@ -20,12 +21,12 @@ final taskProvider = FutureProvider<List<Task>>((ref) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
-  final preference = await Database.tryGetPreferences();
   await Database.insertTask("Test task");
+  // Set riverpod globals, so they'll be lazy loaded later.
+  await _setGlobalPref();
 
-  runApp(ProviderScope(
+  runApp(const ProviderScope(
       child: MyApp(
-    preference: preference,
   )));
 }
 
@@ -35,11 +36,11 @@ ThemeMode getThemeMode() {
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key, required this.preference});
-  final Preference? preference;
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var preference = ref.watch(preferenceProvider);
+    
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -48,23 +49,13 @@ class MyApp extends ConsumerWidget {
       ),
       darkTheme:
           ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
-      themeMode: preference == null
-          ? ThemeMode.system
-          : (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
+      themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
       // Idea: replace
       home: const HomePage(title: 'Tomorrow TODO'),
     );
   }
 }
-
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({super.key, required this.title});
-//   final String title;
-
-//   @override
-//   State<MyHomePage> createState() => _MyHomePageState();
-// }
 
 class HomePage extends ConsumerWidget {
   final String title;
@@ -84,13 +75,6 @@ class HomePage extends ConsumerWidget {
                 value: 1,
                 child: const Text("Settings"),
                 onTap: () {
-                  final Brightness brightnessValue =
-                      MediaQuery.of(context).platformBrightness;
-                  // Set value of darkmode.
-                  ref
-                      .read(preferenceProvider.notifier)
-                      .setDarkMode(brightnessValue == Brightness.dark);
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Settings()),
@@ -248,4 +232,19 @@ class _TaskEntryState extends State<TaskEntry> {
       ),
     );
   }
+}
+
+Future<void> _setGlobalPref() async {
+  var pref = await Database.tryGetPreferences();
+  if (pref == null) {
+    // Fetch and use phone theme if preferences not available
+    _setGlobalPrefBasedOnPlatform();
+  } else {
+    globalPref = pref;
+  }
+}
+// Function to set globalPref based on platform theme
+void _setGlobalPrefBasedOnPlatform() {
+  var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  globalPref = Preference()..darkMode = brightness == Brightness.dark;
 }
