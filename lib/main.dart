@@ -17,7 +17,11 @@ TextTheme getTextTheme() {
 final taskProvider = FutureProvider<List<Task>>((ref) async {
   return await Database.getAllTasks();
 });
-
+Widget square() {
+  return Container(
+      color: Colors.pink,
+  );
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
@@ -93,6 +97,7 @@ class HomePage extends ConsumerWidget {
                 child: const Center(child: Text(
                     // Idea: replace with some kind digital date?
                     "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
+              // Flexible(child: square()),
             const Expanded(
               child: TaskViewer(),
             ),
@@ -215,20 +220,27 @@ class _TaskEntryState extends State<TaskEntry> {
           ),
         );
       },
-      child: Row(
-        children: [
-          Checkbox(
-            checkColor: Colors.white,
-            fillColor: MaterialStateProperty.resolveWith(getColor),
-            value: widget.task.done,
-            onChanged: (bool? value) {
-              setState(() {
-                Database.toggleDone(widget.task);
-              });
-            },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          color: widget.task.done ? Colors.green : Colors.red,
+          padding: const EdgeInsets.all(14.0),
+          child: Row(
+            children: [
+              Checkbox(
+                checkColor: Colors.white,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: widget.task.done,
+                onChanged: (bool? value) {
+                  setState(() {
+                    Database.toggleDone(widget.task);
+                  });
+                },
+              ),
+              Expanded(child: Text(widget.task.title)),
+            ],
           ),
-          Expanded(child: Text(widget.task.title)),
-        ],
+        ),
       ),
     );
   }
