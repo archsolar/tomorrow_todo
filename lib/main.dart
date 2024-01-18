@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -5,7 +7,9 @@ import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/components/stored_structs.dart';
 import 'package:tomorrow_todo/settings.dart';
 import 'darkModeProvider.dart';
-// import 'package:simple_permissions/simple_permissions.dart';
+import 'package:intl/intl.dart';
+
+var dateCode = 'dd-MM';
 
 // Idea: check if there are user settings available else fall back to this
 TextTheme getTextTheme() {
@@ -17,11 +21,6 @@ TextTheme getTextTheme() {
 final taskProvider = FutureProvider<List<Task>>((ref) async {
   return await Database.getAllTasks();
 });
-Widget square() {
-  return Container(
-      color: Colors.pink,
-  );
-}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
@@ -29,9 +28,7 @@ Future<void> main() async {
   // Set riverpod globals, so they'll be lazy loaded later.
   await _setGlobalPref();
 
-  runApp(const ProviderScope(
-      child: MyApp(
-  )));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 ThemeMode getThemeMode() {
@@ -44,7 +41,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var preference = ref.watch(preferenceProvider);
-    
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -97,7 +94,7 @@ class HomePage extends ConsumerWidget {
                 child: const Center(child: Text(
                     // Idea: replace with some kind digital date?
                     "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
-              // Flexible(child: square()),
+            SizedBox(height: 100, width: 150, child: successTiles(10)),
             const Expanded(
               child: TaskViewer(),
             ),
@@ -110,6 +107,69 @@ class HomePage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget square() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Container(
+          color: Colors.green,
+          width: 25,
+          height: 25,
+        ),
+      ),
+    );
+  }
+
+  String getDay(DateTime date) {
+    return DateFormat('EEEE').format(date);
+  }
+
+  String getDate(DateTime date) {
+    return DateFormat(dateCode).format(date);
+  }
+
+  Widget successTiles(int days) {
+    // DateTime tomorrow_date = DateTime.now().add(const Duration(days: 1));
+    DateTime firstIndex = DateTime.now().subtract(Duration(days: days-1));
+
+    return ListView.builder(
+      itemCount: days+1,
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        final DateTime baseDate = firstIndex;
+        int remaining = days-index;
+        String day;
+        if (remaining <= 6) {
+          day = getDay(baseDate.add(Duration(days: index)));
+        } else {
+          day = getDate(baseDate.add(Duration(days: index)));
+        }
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            height: 30,
+            padding: const EdgeInsets.all(0),
+            child: Stack(
+              children: [
+                Row(
+                  children: [
+                    Center(
+                        child: Text(day,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .apply())),
+                  ],
+                ),
+                Center(child: square()),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -221,7 +281,12 @@ class _TaskEntryState extends State<TaskEntry> {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(
+          top: 8.0,
+          left: 8.0,
+          right: 8.0,
+          bottom: 0.0, // No padding at the bottom
+        ),
         child: Container(
           color: widget.task.done ? Colors.green : Colors.red,
           padding: const EdgeInsets.all(14.0),
@@ -255,8 +320,10 @@ Future<void> _setGlobalPref() async {
     globalPref = pref;
   }
 }
+
 // Function to set globalPref based on platform theme
 void _setGlobalPrefBasedOnPlatform() {
-  var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  var brightness =
+      SchedulerBinding.instance.platformDispatcher.platformBrightness;
   globalPref = Preference()..darkMode = brightness == Brightness.dark;
 }
