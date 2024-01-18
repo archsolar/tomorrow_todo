@@ -18,13 +18,14 @@ TextTheme getTextTheme() {
   );
 }
 
+//TODO I want this to view newly added tasks somehow. Not sure how to do that.
 final taskProvider = FutureProvider<List<Task>>((ref) async {
   return await Database.getAllTasks();
 });
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
-  await Database.insertTask("Test task");
+  // await Database.insertTask("Test task");
   // Set riverpod globals, so they'll be lazy loaded later.
   await _setGlobalPref();
 
@@ -53,15 +54,17 @@ class MyApp extends ConsumerWidget {
       themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
       // Idea: replace
-      home: const HomePage(title: 'Tomorrow TODO'),
+      home: HomePage(title: 'Tomorrow TODO'),
     );
   }
 }
 
 class HomePage extends ConsumerWidget {
   final String title;
+  
+  final bottomInput = TextEditingController();
 
-  const HomePage({super.key, required this.title});
+  HomePage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,13 +95,19 @@ class HomePage extends ConsumerWidget {
             Container(
                 color: Theme.of(context).colorScheme.inversePrimary,
                 child: const Center(child: Text(
-                    // Idea: replace with some kind digital date?
+                    // Idea: replace with some kind of digital date?
                     "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
             SizedBox(height: 100, width: 150, child: successTiles(10)),
             const Expanded(
               child: TaskViewer(),
             ),
-            const TextField(
+            // Add tasks for tomorrow.
+            TextField(
+              onSubmitted: (value) {
+                Database.insertTask(value);
+                bottomInput.clear();
+              },
+              controller: bottomInput,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Tomorrow\'s tasks',
@@ -142,9 +151,12 @@ class HomePage extends ConsumerWidget {
         final DateTime baseDate = firstIndex;
         int remaining = days-index;
         String day;
-        if (remaining <= 6) {
+        if (remaining == 0) {
+          day = "Tomorrow";
+        } else if(remaining <= 6) {
           day = getDay(baseDate.add(Duration(days: index)));
-        } else {
+        }
+          else {
           day = getDate(baseDate.add(Duration(days: index)));
         }
         return Align(
