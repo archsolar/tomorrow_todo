@@ -1,16 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tomorrow_todo/providers.dart';
+import 'package:tomorrow_todo/components/database.dart';
+import 'package:tomorrow_todo/components/stored_structs.dart';
 
+late Preference globalPref;
+
+class PreferenceNotifier extends Notifier<Preference> {
+  @override
+  Preference build() => globalPref;
+
+  void toggleDarkMode() {
+    state = Preference()..darkMode = !state.darkMode;
+    Database.setDarkMode(state.darkMode);
+  }
+
+  void set(Preference newPreference) {
+    state = newPreference;
+  }
+
+  void setDarkMode(bool value) {
+    state = Preference()..darkMode = value;
+  }
+  void setFontSize(double value) {
+    state = Preference()..fontSize = value;
+  }
+  // void setFont() {
+
+  // }
+}
+
+final preferenceProvider =
+    NotifierProvider<PreferenceNotifier, Preference>(PreferenceNotifier.new);
+const List<double> fontSizes = [23.0, 25.0, 28.0];
 class Settings extends ConsumerWidget {
   String _fontFamily = 'Roboto';
-  double _fontSize = 14.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Query whether darkmode is on
     var preference = ref.watch(preferenceProvider);
-
+    double fontSize = preference.fontSize;
+    if (!fontSizes.contains(fontSize)) {
+      fontSize = 25.0;
+    }
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -31,25 +63,25 @@ class Settings extends ConsumerWidget {
             ListTile(
               title: const Text('Font size'),
               trailing: DropdownButton<double>(
-                value: _fontSize,
-                items: const <DropdownMenuItem<double>>[
+                value: fontSize,
+                items: <DropdownMenuItem<double>>[
                   DropdownMenuItem<double>(
-                    value: 14.0,
-                    child: Text('14'),
+                    value: fontSizes[0],
+                    child: const Text('23'),
                   ),
                   DropdownMenuItem<double>(
-                    value: 18.0,
-                    child: Text('18'),
+                    value: fontSizes[1],
+                    child: const Text('25 (default)'),
                   ),
                   DropdownMenuItem<double>(
-                    value: 22.0,
-                    child: Text('22'),
+                    value: fontSizes[2],
+                    child: const Text('28'),
                   ),
                 ],
                 onChanged: (double? newValue) {
-                  // setState(() {
-                  //   _fontSize = newValue!;
-                  // });
+                  if (newValue != null) {
+                    ref.read(preferenceProvider.notifier).setFontSize(newValue);
+                  }
                 },
               ),
             ),

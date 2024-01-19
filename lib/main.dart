@@ -12,9 +12,9 @@ import 'package:intl/intl.dart';
 var dateCode = 'dd-MM';
 
 // Idea: check if there are user settings available else fall back to this
-TextTheme getTextTheme() {
-  return const TextTheme(
-    bodyMedium: TextStyle(fontSize: 25.0),
+TextTheme getTextTheme(double fontSize) {
+  return TextTheme(
+    bodyMedium: TextStyle(fontSize: fontSize),
   );
 }
 
@@ -38,10 +38,10 @@ class MyApp extends ConsumerWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.light,
-        textTheme: getTextTheme(),
+        textTheme: getTextTheme(preference.fontSize),
       ),
       darkTheme:
-          ThemeData(brightness: Brightness.dark, textTheme: getTextTheme()),
+          ThemeData(brightness: Brightness.dark, textTheme: getTextTheme(preference.fontSize)),
       themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
       // Idea: replace

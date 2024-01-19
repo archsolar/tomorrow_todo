@@ -17,6 +17,6 @@ class Task {
 class Preference {
   Id id = 0;
   bool darkMode = true;
-  double fontSize = 14.0;
+  double fontSize = 25.0;
   String font = "Roboto";
 }

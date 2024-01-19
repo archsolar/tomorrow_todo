@@ -5,26 +5,7 @@ import 'package:tomorrow_todo/components/database.dart';
 
 import 'components/stored_structs.dart';
 
-late Preference globalPref;
 late List<Task> tasks;
-
-class PreferenceNotifier extends Notifier<Preference> {
-  @override
-  Preference build() => globalPref;
-
-  void toggleDarkMode() {
-    state = Preference()..darkMode = !state.darkMode;
-    Database.setDarkMode(state.darkMode);
-  }
-
-  void set(Preference newPreference) {
-    state = newPreference;
-  }
-
-  void setDarkMode(bool value) {
-    state = Preference()..darkMode = value;
-  }
-}
 class TaskNotifier extends Notifier<List<Task>> {
   @override
   List<Task> build() => tasks;
@@ -52,8 +33,6 @@ class TaskNotifier extends Notifier<List<Task>> {
   }
 }
 
-final preferenceProvider =
-    NotifierProvider<PreferenceNotifier, Preference>(PreferenceNotifier.new);
 final taskProvider =
     NotifierProvider<TaskNotifier, List<Task>>(TaskNotifier.new);
 
