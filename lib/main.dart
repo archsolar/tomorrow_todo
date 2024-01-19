@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -188,12 +188,12 @@ class TaskViewer extends ConsumerWidget {
     final tasks = ref.watch(taskProvider);
 
     return ListView(
-            children: tasks.map((Task task) {
-              return TaskEntry(
-                task: task,
-              );
-            }).toList(),
-          );
+      children: tasks.map((Task task) {
+        return TaskEntry(
+          task: task,
+        );
+      }).toList(),
+    );
   }
 }
 
@@ -230,18 +230,11 @@ class TaskEntry extends ConsumerWidget {
             ),
             actions: [
               TextButton(
-                child: const Text('Save'),
+                child: const Text('Confirm'),
                 onPressed: () {
                   ref
                       .read(taskProvider.notifier)
                       .editTaskTitle(task, _controller.text);
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('Delete'),
-                onPressed: () {
-                  ref.read(taskProvider.notifier).removeTask(task.id);
                   Navigator.of(context).pop();
                 },
               ),
@@ -270,6 +263,39 @@ class TaskEntry extends ConsumerWidget {
                 },
               ),
               Expanded(child: Text(task.title)),
+              IconButton(
+                onPressed: () {
+                  // Show a popup or perform some action before deleting the task
+                  // You can use showDialog to create a confirmation dialog
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Delete Task'),
+                        content:
+                            Text('Are you sure you want to delete this task?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Delete the task here
+                              ref.read(taskProvider.notifier).removeTask(task.id);
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: Text('Delete'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(Icons.delete, color: Colors.white),
+              ),
             ],
           ),
         ),
