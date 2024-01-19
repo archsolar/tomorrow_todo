@@ -54,8 +54,13 @@ class Database {
   }
 
   // Add a task
-  static insertTask(String title) async {
+  static addTaskFromTitle(String title) async {
     final newTask = Task()..title = title;
+    await isar.writeTxn(() async {
+      await isar.tasks.put(newTask);
+    });
+  }
+  static addTask(Task newTask) async {
     await isar.writeTxn(() async {
       await isar.tasks.put(newTask);
     });

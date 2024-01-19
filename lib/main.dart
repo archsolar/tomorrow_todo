@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/components/stored_structs.dart';
 import 'package:tomorrow_todo/settings.dart';
-import 'darkModeProvider.dart';
+import 'providers.dart';
 import 'package:intl/intl.dart';
 
 var dateCode = 'dd-MM';
@@ -18,18 +18,15 @@ TextTheme getTextTheme() {
   );
 }
 
-//TODO I want this to view newly added tasks somehow. Not sure how to do that.
-final taskProvider = FutureProvider<List<Task>>((ref) async {
-  return await Database.getAllTasks();
-});
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Database.init();
-  // await Database.insertTask("Test task");
   // Set riverpod globals, so they'll be lazy loaded later.
   await _setGlobalPref();
-
-  runApp(const ProviderScope(child: MyApp()));
+  tasks = await Database.getAllTasks();
+  runApp(ProviderScope(
+    child: MyApp(),
+  ));
 }
 
 ThemeMode getThemeMode() {
@@ -61,7 +58,7 @@ class MyApp extends ConsumerWidget {
 
 class HomePage extends ConsumerWidget {
   final String title;
-  
+
   final bottomInput = TextEditingController();
 
   HomePage({super.key, required this.title});
@@ -98,13 +95,13 @@ class HomePage extends ConsumerWidget {
                     // Idea: replace with some kind of digital date?
                     "4 January 2024"))), // It either reads {today's date} or "Tomorrow"
             SizedBox(height: 100, width: 150, child: successTiles(10)),
-            const Expanded(
+            Expanded(
               child: TaskViewer(),
             ),
             // Add tasks for tomorrow.
             TextField(
               onSubmitted: (value) {
-                Database.insertTask(value);
+                ref.read(taskProvider.notifier).addTask(value);
                 bottomInput.clear();
               },
               controller: bottomInput,
@@ -142,21 +139,20 @@ class HomePage extends ConsumerWidget {
 
   Widget successTiles(int days) {
     // DateTime tomorrow_date = DateTime.now().add(const Duration(days: 1));
-    DateTime firstIndex = DateTime.now().subtract(Duration(days: days-1));
+    DateTime firstIndex = DateTime.now().subtract(Duration(days: days - 1));
 
     return ListView.builder(
-      itemCount: days+1,
+      itemCount: days + 1,
       shrinkWrap: true,
       itemBuilder: (context, index) {
         final DateTime baseDate = firstIndex;
-        int remaining = days-index;
+        int remaining = days - index;
         String day;
         if (remaining == 0) {
           day = "Tomorrow";
-        } else if(remaining <= 6) {
+        } else if (remaining <= 6) {
           day = getDay(baseDate.add(Duration(days: index)));
-        }
-          else {
+        } else {
           day = getDate(baseDate.add(Duration(days: index)));
         }
         return Align(
@@ -186,67 +182,30 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-class TaskViewer extends StatefulWidget {
-  const TaskViewer({super.key});
-
+class TaskViewer extends ConsumerWidget {
   @override
-  TaskViewerState createState() => TaskViewerState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tasks = ref.watch(taskProvider);
 
-class TaskViewerState extends State<TaskViewer> {
-  void updateState() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final tasks = Database.getAllTasks();
-
-    return FutureBuilder<List<Task>>(
-      future: tasks,
-      builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.data == null) {
-          return const Text("Wait for tomorrow/Something went wrong :)");
-        } else {
-          return ListView(
-            children: snapshot.data!.map((Task task) {
+    return ListView(
+            children: tasks.map((Task task) {
               return TaskEntry(
                 task: task,
-                onUpdate: updateState,
               );
             }).toList(),
           );
-        }
-      },
-    );
   }
 }
 
-class TaskEntry extends StatefulWidget {
-  final Task task;
-  final Function onUpdate;
-
-  const TaskEntry({super.key, required this.task, required this.onUpdate});
-
-  @override
-  State<TaskEntry> createState() => _TaskEntryState();
-}
-
-class _TaskEntryState extends State<TaskEntry> {
+class TaskEntry extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
+  final Task task;
+  TaskEntry({super.key, required this.task});
 
   @override
-  void initState() {
-    super.initState();
-    _controller.text = widget.task.title;
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    _controller.text = task.title;
 
-  @override
-  Widget build(BuildContext context) {
     Color getColor(Set<MaterialState> states) {
       const Set<MaterialState> interactiveStates = <MaterialState>{
         MaterialState.pressed,
@@ -273,18 +232,16 @@ class _TaskEntryState extends State<TaskEntry> {
               TextButton(
                 child: const Text('Save'),
                 onPressed: () {
-                  setState(() {
-                    Database.changeTaskTitle(widget.task, _controller.text);
-                  });
+                  ref
+                      .read(taskProvider.notifier)
+                      .editTaskTitle(task, _controller.text);
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
                 child: const Text('Delete'),
                 onPressed: () {
-                  Database.deleteTask(widget.task.id).then((value) {
-                    widget.onUpdate();
-                  });
+                  ref.read(taskProvider.notifier).removeTask(task.id);
                   Navigator.of(context).pop();
                 },
               ),
@@ -300,21 +257,19 @@ class _TaskEntryState extends State<TaskEntry> {
           bottom: 0.0, // No padding at the bottom
         ),
         child: Container(
-          color: widget.task.done ? Colors.green : Colors.red,
+          color: task.done ? Colors.green : Colors.red,
           padding: const EdgeInsets.all(14.0),
           child: Row(
             children: [
               Checkbox(
                 checkColor: Colors.white,
                 fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: widget.task.done,
+                value: task.done,
                 onChanged: (bool? value) {
-                  setState(() {
-                    Database.toggleDone(widget.task);
-                  });
+                  ref.read(taskProvider.notifier).toggleDone(task);
                 },
               ),
-              Expanded(child: Text(widget.task.title)),
+              Expanded(child: Text(task.title)),
             ],
           ),
         ),

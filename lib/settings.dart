@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tomorrow_todo/darkModeProvider.dart';
+import 'package:tomorrow_todo/providers.dart';
 
 class Settings extends ConsumerWidget {
   String _fontFamily = 'Roboto';
