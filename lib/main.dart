@@ -28,12 +28,6 @@ Future<void> main() async {
     child: MyApp(),
   ));
 }
-
-ThemeMode getThemeMode() {
-  // Idea: check if there are user settings available else fall back to this
-  return ThemeMode.system;
-}
-
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override

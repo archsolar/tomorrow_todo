@@ -13,7 +13,7 @@ class Settings extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading: const BackButton(),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 0.0), // adjust the value as needed
