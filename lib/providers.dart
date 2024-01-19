@@ -6,7 +6,7 @@ import 'package:tomorrow_todo/components/database.dart';
 import 'components/stored_structs.dart';
 
 late Preference globalPref;
-late Future<List<Task>> tasks;
+late List<Task> tasks;
 
 class PreferenceNotifier extends Notifier<Preference> {
   @override
@@ -25,29 +25,29 @@ class PreferenceNotifier extends Notifier<Preference> {
     state = Preference()..darkMode = value;
   }
 }
-class TaskNotifier extends Notifier<Future<List<Task>>> {
+class TaskNotifier extends Notifier<List<Task>> {
   @override
-  Future<List<Task>> build() => tasks;
+  List<Task> build() => tasks;
 
   Future<void> addTask(String title) async {
     final newTask = Task()..title = title;
     await Database.addTask(newTask);
-    state = Database.getAllTasks();
+    state = await Database.getAllTasks();
   }
 
   Future<void> removeTask(int taskId) async {
     await Database.deleteTask(taskId);
-    state = Database.getAllTasks();
+    state = await Database.getAllTasks();
   }
 
   Future<void> editTaskTitle(Task task, String newTitle) async {
     await Database.changeTaskTitle(task, newTitle);
-    state = Database.getAllTasks();
+    state = await Database.getAllTasks();
   }
 
   Future<void> toggleDone(Task task) async {
     await Database.toggleDone(task);
-    state = Database.getAllTasks();
+    state = await Database.getAllTasks();
 
   }
 }
@@ -55,7 +55,7 @@ class TaskNotifier extends Notifier<Future<List<Task>>> {
 final preferenceProvider =
     NotifierProvider<PreferenceNotifier, Preference>(PreferenceNotifier.new);
 final taskProvider =
-    NotifierProvider<TaskNotifier, Future<List<Task>>>(TaskNotifier.new);
+    NotifierProvider<TaskNotifier, List<Task>>(TaskNotifier.new);
 
 
 
