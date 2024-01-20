@@ -9,17 +9,9 @@ class PreferenceNotifier extends Notifier<Preference> {
   @override
   Preference build() => globalPref;
 
-  void toggleDarkMode() {
-    state = Preference()..darkMode = !state.darkMode;
-    Database.setDarkMode(state.darkMode);
-  }
-
-  void set(Preference newPreference) {
-    state = newPreference;
-  }
-
-  void setDarkMode(bool value) {
-    state = Preference()..darkMode = value;
+  Future<void> toggleDarkMode() async {
+    await Database.setDarkMode(!state.darkMode);
+    await fetchDatabase();
   }
 
   Future<void> setFontSize(double value) async {
@@ -63,7 +55,7 @@ class Settings extends ConsumerWidget {
         leading: const BackButton(),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 0.0), // adjust the value as needed
+        padding: const EdgeInsets.only(top: 0.0),
         child: ListView(
           children: <Widget>[
             ListTile(

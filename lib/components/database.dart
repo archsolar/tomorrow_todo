@@ -76,13 +76,6 @@ class Database {
     });
   }
 
-  // Toggle recurring
-  // toggleRecurring(Task task) async {
-  //   await isar.writeTxn(() async {
-  //     task.recurring = !task.recurring;
-  //     await isar.tasks.put(task);
-  //   });
-  // }
   static changeTaskTitle(Task task, String newTitle) async {
     await isar.writeTxn(() async {
       task.title = newTitle;
