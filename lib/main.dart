@@ -11,10 +11,28 @@ import 'package:intl/intl.dart';
 
 var dateCode = 'dd-MM';
 
-// Idea: check if there are user settings available else fall back to this
-TextTheme getTextTheme(double fontSize) {
+TextTheme getTextTheme(double fontSize, String fontFamily) {
+  if (fontFamily == fontNames[1]) {
+    return TextTheme(
+      bodyMedium: TextStyle(fontSize: fontSize),
+    );
+  }
   return TextTheme(
-    bodyMedium: TextStyle(fontSize: fontSize),
+    displayLarge: TextStyle(fontFamily: fontFamily),
+    displayMedium: TextStyle(fontFamily: fontFamily),
+    displaySmall: TextStyle(fontFamily: fontFamily),
+    headlineLarge: TextStyle(fontFamily: fontFamily),
+    headlineMedium: TextStyle(fontFamily: fontFamily),
+    headlineSmall: TextStyle(fontFamily: fontFamily),
+    titleLarge: TextStyle(fontFamily: fontFamily),
+    titleMedium: TextStyle(fontFamily: fontFamily),
+    titleSmall: TextStyle(fontFamily: fontFamily),
+    bodyLarge: TextStyle(fontFamily: fontFamily),
+    bodyMedium: TextStyle(fontSize: fontSize, fontFamily: fontFamily),
+    bodySmall: TextStyle(fontFamily: fontFamily),
+    labelLarge: TextStyle(fontFamily: fontFamily),
+    labelMedium: TextStyle(fontFamily: fontFamily),
+    labelSmall: TextStyle(fontFamily: fontFamily),
   );
 }
 
@@ -28,6 +46,7 @@ Future<void> main() async {
     child: MyApp(),
   ));
 }
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override
@@ -38,13 +57,13 @@ class MyApp extends ConsumerWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         brightness: Brightness.light,
-        textTheme: getTextTheme(preference.fontSize),
+        textTheme: getTextTheme(preference.fontSize, preference.font),
       ),
-      darkTheme:
-          ThemeData(brightness: Brightness.dark, textTheme: getTextTheme(preference.fontSize)),
+      darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          textTheme: getTextTheme(preference.fontSize, preference.font)),
       themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
       debugShowCheckedModeBanner: false,
-      // Idea: replace
       home: HomePage(title: 'Tomorrow TODO'),
     );
   }
@@ -278,7 +297,9 @@ class TaskEntry extends ConsumerWidget {
                           TextButton(
                             onPressed: () {
                               // Delete the task here
-                              ref.read(taskProvider.notifier).removeTask(task.id);
+                              ref
+                                  .read(taskProvider.notifier)
+                                  .removeTask(task.id);
                               Navigator.of(context).pop(); // Close the dialog
                             },
                             child: Text('Delete'),

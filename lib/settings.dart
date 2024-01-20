@@ -5,6 +5,7 @@ import 'package:tomorrow_todo/components/stored_structs.dart';
 
 late Preference globalPref;
 
+
 class PreferenceNotifier extends Notifier<Preference> {
   @override
   Preference build() => globalPref;
@@ -21,27 +22,43 @@ class PreferenceNotifier extends Notifier<Preference> {
   void setDarkMode(bool value) {
     state = Preference()..darkMode = value;
   }
-  void setFontSize(double value) {
-    state = Preference()..fontSize = value;
-  }
-  // void setFont() {
 
-  // }
+  Future<void> setFontSize(double value) async {
+    if (fontSizes.contains(value)) {
+      await Database.updateFontSize(value);
+      await fetchDatabase();
+    }
+  }
+
+  Future<void> fetchDatabase() async {
+    state = await Database.getPreferences();
+  }
+
+  Future<void> setFont(String value) async {
+    if (fontNames.contains(value)) {
+      // state = Preference()..font = value;
+      await Database.updateFont(value);
+      await fetchDatabase();
+    }
+  }
 }
 
 final preferenceProvider =
     NotifierProvider<PreferenceNotifier, Preference>(PreferenceNotifier.new);
-const List<double> fontSizes = [23.0, 25.0, 28.0];
-class Settings extends ConsumerWidget {
-  String _fontFamily = 'Roboto';
 
+class Settings extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Query whether darkmode is on
     var preference = ref.watch(preferenceProvider);
     double fontSize = preference.fontSize;
+    String fontFamily = preference.font;
+
     if (!fontSizes.contains(fontSize)) {
-      fontSize = 25.0;
+      fontSize = fontSizes[1];
+    }
+    if (!fontNames.contains(fontFamily)) {
+      fontFamily = fontNames[1];
     }
     return Scaffold(
       appBar: AppBar(
@@ -88,25 +105,25 @@ class Settings extends ConsumerWidget {
             ListTile(
               title: const Text('Font type'),
               trailing: DropdownButton<String>(
-                value: _fontFamily,
-                items: const <DropdownMenuItem<String>>[
+                value: fontFamily,
+                items: <DropdownMenuItem<String>>[
                   DropdownMenuItem<String>(
-                    value: 'Roboto',
-                    child: Text('Roboto'),
+                    value: fontNames[0],
+                    child: const Text('Open Sans'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'Arial',
-                    child: Text('Arial'),
+                    value: fontNames[1],
+                    child: const Text('Default'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'Courier',
-                    child: Text('Courier'),
+                    value: fontNames[2],
+                    child: const Text('Oswald'),
                   ),
                 ],
                 onChanged: (String? newValue) {
-                  // setState(() {
-                  //   _fontFamily = newValue!;
-                  // });
+                  if (newValue != null) {
+                    ref.read(preferenceProvider.notifier).setFont(newValue);
+                  }
                 },
               ),
             ),

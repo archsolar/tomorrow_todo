@@ -1,7 +1,8 @@
 import 'package:isar/isar.dart';
 
 part 'stored_structs.g.dart';
-
+const List<double> fontSizes = [23.0, 25.0, 28.0];
+const List<String> fontNames = ['OpenSans', 'Default', 'Oswald'];
 @collection
 class Task {
   Id id = Isar.autoIncrement;
@@ -9,7 +10,6 @@ class Task {
   bool done = false;
   // bool recurring = false;
   DateTime date = DateTime.now().add(const Duration(days: 1));
-
   Task({this.title = ""});
 }
 
@@ -17,6 +17,6 @@ class Task {
 class Preference {
   Id id = 0;
   bool darkMode = true;
-  double fontSize = 25.0;
-  String font = "Roboto";
+  double fontSize = fontSizes[1];
+  String font = fontNames[1];
 }
