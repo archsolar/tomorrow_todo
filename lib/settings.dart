@@ -5,7 +5,6 @@ import 'package:tomorrow_todo/components/stored_structs.dart';
 
 late Preference globalPref;
 
-
 class PreferenceNotifier extends Notifier<Preference> {
   @override
   Preference build() => globalPref;
@@ -36,7 +35,6 @@ class PreferenceNotifier extends Notifier<Preference> {
 
   Future<void> setFont(String value) async {
     if (fontNames.contains(value)) {
-      // state = Preference()..font = value;
       await Database.updateFont(value);
       await fetchDatabase();
     }

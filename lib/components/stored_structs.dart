@@ -1,8 +1,10 @@
 import 'package:isar/isar.dart';
 
 part 'stored_structs.g.dart';
+
 const List<double> fontSizes = [23.0, 25.0, 28.0];
 const List<String> fontNames = ['OpenSans', 'Default', 'Oswald'];
+
 @collection
 class Task {
   Id id = Isar.autoIncrement;

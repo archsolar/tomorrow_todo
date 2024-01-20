@@ -6,6 +6,7 @@ import 'package:tomorrow_todo/components/database.dart';
 import 'components/stored_structs.dart';
 
 late List<Task> tasks;
+
 class TaskNotifier extends Notifier<List<Task>> {
   @override
   List<Task> build() => tasks;
@@ -29,14 +30,11 @@ class TaskNotifier extends Notifier<List<Task>> {
   Future<void> toggleDone(Task task) async {
     await Database.toggleDone(task);
     state = await Database.getAllTasks();
-
   }
 }
 
 final taskProvider =
     NotifierProvider<TaskNotifier, List<Task>>(TaskNotifier.new);
-
-
 
 // Alternative
 // // Idea option 1 this has awaits, option 2 this is an async with future,so awaits can be handled in the ui.

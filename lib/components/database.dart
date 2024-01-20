@@ -60,6 +60,7 @@ class Database {
       await isar.tasks.put(newTask);
     });
   }
+
   static addTask(Task newTask) async {
     await isar.writeTxn(() async {
       await isar.tasks.put(newTask);
