@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:tomorrow_todo/components/stored_structs.dart';
-import 'package:tomorrow_todo/main.dart';
 import 'package:tomorrow_todo/providers.dart';
 import 'package:tomorrow_todo/settings.dart';
+var dateCode = 'dd-MM';
 
 class DailyPage extends ConsumerWidget {
   final String title;
