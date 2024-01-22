@@ -21,4 +21,14 @@ class Preference {
   bool darkMode = true;
   double fontSize = fontSizes[1];
   String font = fontNames[1];
+  DateTime dayStartTime = DateTime.now();
+}
+
+/// Returns middle of the day tomorrow.
+DateTime returnDate() {
+  DateTime date = DateTime.now().add(const Duration(days: 1));
+  // date = date.add(const Duration(hours: 12));
+  // DateTime dateOnly = DateTime(date.year, date.month, date.day);
+
+  return date;
 }

@@ -31,6 +31,10 @@ class TaskNotifier extends Notifier<List<Task>> {
     await Database.toggleDone(task);
     state = await Database.getAllTasks();
   }
+
+  void getFirstTaskDate() {
+    
+  }
 }
 
 final taskProvider =
