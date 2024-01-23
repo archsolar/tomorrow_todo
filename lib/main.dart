@@ -86,16 +86,6 @@ class Page1 extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Heading
-          // Center(
-          //   child: Text(
-          //     "Rules:",
-          //     style: TextStyle(
-          //       fontSize: 24,
-          //       fontWeight: FontWeight.bold,
-          //     ),
-          //   ),
-          // ),
           SizedBox(height: 16), // Adding some spacing
           // Container with rules
           Center(
@@ -114,24 +104,14 @@ class Page1 extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Container(
-              padding: EdgeInsets.all(16),
-
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                color: Color.fromARGB(255, 20, 17, 17),
-                borderRadius: BorderRadius.circular(8),
-              ),
+                  color: Color.fromARGB(255, 20, 17, 17),
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-            child: Text(
-              "Rules:",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
                     RuleText(
                         "1 - You need to finish all tasks before the day ends or your app will be disabled."),
                     RuleText(
@@ -182,12 +162,17 @@ class Page2 extends StatelessWidget {
     var date = DateFormat(dateCode).format(DateTime.now());
 
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 20, 17, 17),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: RuleText("1 - Current time: $date"),
+      child: Center(child: Column(
+        children: [
+          RuleText("1 - Current time: $date"),
+        ],
+      )),
     );
   }
 }

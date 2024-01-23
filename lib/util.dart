@@ -41,9 +41,11 @@ Future<void> setGlobalPref() async {
   }
 }
 
-// Function to set globalPref based on platform theme
+/// Function to set globalPref based on platform theme
+/// For now dark mode is true by default.
 void setGlobalPrefBasedOnPlatform() {
-  var brightness =
-      SchedulerBinding.instance.platformDispatcher.platformBrightness;
-  globalPref = Preference()..darkMode = brightness == Brightness.dark;
+  // var brightness =
+  //     SchedulerBinding.instance.platformDispatcher.platformBrightness;
+  // globalPref = Preference()..darkMode = brightness == Brightness.dark;
+  globalPref = Preference()..darkMode = true;
 }
