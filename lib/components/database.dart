@@ -94,7 +94,7 @@ class Database {
       }
     });
   }
-
+  // P R E F E R E N C E
   // Either returns preference or null if it fails to fetch.
   static Future<Preference?> tryGetPreferences() async {
     final preferences = await isar.preferences.getAll([0]);
