@@ -34,22 +34,40 @@ class StartupWidget extends ConsumerWidget {
   }
 }
 
+class SetupPage extends ConsumerWidget {
+  const SetupPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final widget = ref.watch(currentSetupWidget);
+    return Scaffold(body: widget);
+  }
+}
+
 final currentSetupWidget = StateProvider<ConsumerWidget>((ref) {
   return Page1();
 });
 
 class Page1 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container();
+    return Column(
+      children: [
+        Text("Page1"),
+        ElevatedButton(
+            onPressed: () {
+              // Navigate to Page2
+              ref.read(currentSetupWidget.notifier).state = Page2();
+              //TODO how to go back to Page1?
+            },
+            child: Text("Continue to page2"))
+      ],
+    );
   }
 }
 
-class SetupPage extends ConsumerWidget {
-  const SetupPage({super.key});
-
-  @override
+class Page2 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
-    return Placeholder();
+    return Text("Page2");
   }
 }
 
