@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/daily_page.dart';
 import 'package:tomorrow_todo/settings.dart';
@@ -52,7 +51,6 @@ class NavigationNotifier extends Notifier<List<ConsumerWidget>> {
   List<ConsumerWidget> build() => [Page1()];
 
   void push(ConsumerWidget page) {
-    print("pushed");
     state = [...state, page];
   }
 
@@ -75,20 +73,58 @@ class Page0 extends ConsumerWidget {
 }
 
 class Page1 extends ConsumerWidget {
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16), // Adding some spacing
+            // Container with rules
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 207, 35, 136),
+                      Colors.purple,
+                      const Color.fromARGB(255, 53, 39, 176)
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 20, 17, 17),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RuleText(
+                          "1 - You need to finish all tasks before the day ends or your app will be disabled."),
+                      RuleText(
+                          "2 - There needs to be at least one continuous task by default: [add tasks for tomorrow]"),
+                      RuleText("3 - Everything is stored locally."),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        children: [
-          Text("Page1"),
-          ElevatedButton(
-              onPressed: () {
-                // Navigate to Page2
-                ref.read(navigationProvider.notifier).push(Page2());
-                //TODO how to go back to Page1?
-              },
-              child: Text("I agree"))
-        ],
-      ),
+    return BasicPage(
+      buttonText: "I agree",
+      currentPage: currentPage(),
+      nextPage: Page2(),
     );
   }
 }
@@ -243,25 +279,25 @@ class AppWrap extends ConsumerWidget {
 //   }
 // }
 
-// class RuleText extends StatelessWidget {
-//   final String text;
+class RuleText extends StatelessWidget {
+  final String text;
 
-//   const RuleText(this.text, {super.key});
+  const RuleText(this.text, {super.key});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 8),
-//       child: Text(
-//         text,
-//         style: TextStyle(
-//           color: Colors.white,
-//           fontSize: 16,
-//         ),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+}
 
 // class Page2 extends PagesWidget {
 //   Page2({super.key})
@@ -298,48 +334,47 @@ class AppWrap extends ConsumerWidget {
 //   }
 // }
 
-// class BasicPage extends ConsumerWidget {
-//   final Widget currentPage;
-//   final Widget? nextPage;
-//   // final String text;
-//   final String buttonText;
-//   const BasicPage(
-//       {super.key,
-//       required this.currentPage,
-//       required this.nextPage,
-//       required this.buttonText});
+class BasicPage extends ConsumerWidget {
+  final Widget currentPage;
+  final ConsumerWidget? nextPage;
+  // final String text;
+  final String buttonText;
+  const BasicPage(
+      {super.key,
+      required this.currentPage,
+      required this.nextPage,
+      required this.buttonText});
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return Column(
-//       children: [
-//         SizedBox(height: 40), // Adjust the spacing as needed
-//         SizedBox(
-//             height: MediaQuery.of(context).size.height * 0.7,
-//             child: currentPage),
-//         SizedBox(height: 16), // Adjust the spacing as needed
-//         SizedBox(
-//           height: 50, // Adjust the height as needed
-//           width: double.infinity,
-//           child: ElevatedButton(
-//             onPressed: () {
-//               // TODO lots of work here
-//               if (nextPage == null) {
-//                 // Move on to the main page.
-//               } else {
-//                 // TODO how to correctly change this without using the notivier state thing.
-//                 final a = ref.read(widgetProvider) = Page2();
-//                 // Navigator.push(
-//                 //   context,
-//                 //   MaterialPageRoute(builder: (context) => nextPage!),
-//                 // );
-//                 ref.read();
-//               }
-//             },
-//             child: Text(buttonText),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        children: [
+          SizedBox(height: 40), // Adjust the spacing as needed
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: currentPage),
+          SizedBox(height: 16), // Adjust the spacing as needed
+          SizedBox(
+            height: 50, // Adjust the height as needed
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO lots of work here
+                if (nextPage == null) {
+                  // Move on to the main page.
+                  // TODO SETUP BASIC TASK.
+                } else {
+                  // TODO how to correctly change this without using the notivier state thing.
+                  final nav =
+                      ref.read(navigationProvider.notifier).push(nextPage!);
+                }
+              },
+              child: Text(buttonText),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
