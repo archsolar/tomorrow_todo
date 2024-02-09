@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/daily_page.dart';
 import 'package:tomorrow_todo/settings.dart';
-import 'package:tomorrow_todo/setup_widget.dart';
 import 'package:tomorrow_todo/util.dart';
 import 'providers.dart';
 
@@ -39,35 +38,84 @@ class SetupPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final widget = ref.watch(currentSetupWidget);
-    return Scaffold(body: widget);
+    final currentPageWidget = ref.watch(navigationProvider);
+    return Scaffold(body: currentPageWidget.last);
   }
 }
 
-final currentSetupWidget = StateProvider<ConsumerWidget>((ref) {
-  return Page1();
-});
+final navigationProvider =
+    NotifierProvider<NavigationNotifier, List<ConsumerWidget>>(
+        NavigationNotifier.new);
+
+class NavigationNotifier extends Notifier<List<ConsumerWidget>> {
+  @override
+  List<ConsumerWidget> build() => [Page1()];
+
+  void push(ConsumerWidget page) {
+    print("pushed");
+    state = [...state, page];
+  }
+
+  bool pop() {
+    if (state.length > 1) {
+      state = state.sublist(0, state.length - 1);
+      return true; // Indicate success
+    }
+    return false; // Nothing to pop
+  }
+}
+
+class Page0 extends ConsumerWidget {
+  const Page0({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Placeholder();
+  }
+}
 
 class Page1 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        Text("Page1"),
-        ElevatedButton(
-            onPressed: () {
-              // Navigate to Page2
-              ref.read(currentSetupWidget.notifier).state = Page2();
-              //TODO how to go back to Page1?
-            },
-            child: Text("Continue to page2"))
-      ],
+    return Center(
+      child: Column(
+        children: [
+          Text("Page1"),
+          ElevatedButton(
+              onPressed: () {
+                // Navigate to Page2
+                ref.read(navigationProvider.notifier).push(Page2());
+                //TODO how to go back to Page1?
+              },
+              child: Text("I agree"))
+        ],
+      ),
     );
   }
 }
 
 class Page2 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
-    return Text("Page2");
+    return Center(
+      child: Column(
+        children: [
+          Text("Page2"),
+          ElevatedButton(
+              onPressed: () {
+                // Navigate to Page2
+                ref.read(navigationProvider.notifier).push(Page2());
+                //TODO how to go back to Page1?
+              },
+              child: Text("Continue")),
+          ElevatedButton(
+              onPressed: () {
+                // Navigate to Page2
+                ref.read(navigationProvider.notifier).pop();
+                //TODO how to go back to Page1?
+              },
+              child: Text("back"))
+        ],
+      ),
+    );
   }
 }
 
@@ -247,15 +295,6 @@ class AppWrap extends ConsumerWidget {
 //         ],
 //       )),
 //     );
-//   }
-// }
-
-// class Page3 extends StatelessWidget {
-//   const Page3({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Placeholder();
 //   }
 // }
 
