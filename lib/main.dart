@@ -63,15 +63,6 @@ class NavigationNotifier extends Notifier<List<ConsumerWidget>> {
   }
 }
 
-class Page0 extends ConsumerWidget {
-  const Page0({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Placeholder();
-  }
-}
-
 class Page1 extends ConsumerWidget {
   Widget currentPage() {
     return Padding(
@@ -109,8 +100,9 @@ class Page1 extends ConsumerWidget {
                       RuleText(
                           "1 - You need to finish all tasks before the day ends or your app will be disabled."),
                       RuleText(
-                          "2 - There needs to be at least one continuous task by default: [add tasks for tomorrow]"),
-                      RuleText("3 - Everything is stored locally."),
+                          "2 - There needs to be at least one continuous task \nDefault: [add tasks for tomorrow]"),
+                      RuleText(
+                          "3 - Everything is stored locally, there is no cloud."),
                     ],
                   ),
                 ),
@@ -130,30 +122,115 @@ class Page1 extends ConsumerWidget {
 }
 
 class Page2 extends ConsumerWidget {
+  const Page2({super.key});
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text("Setup fair end of day"));
+  }
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        children: [
-          Text("Page2"),
-          ElevatedButton(
-              onPressed: () {
-                // Navigate to Page2
-                ref.read(navigationProvider.notifier).push(Page2());
-                //TODO how to go back to Page1?
-              },
-              child: Text("Continue")),
-          ElevatedButton(
-              onPressed: () {
-                // Navigate to Page2
-                ref.read(navigationProvider.notifier).pop();
-                //TODO how to go back to Page1?
-              },
-              child: Text("back"))
-        ],
-      ),
+    return BasicPage(
+      buttonText: "Continue",
+      currentPage: currentPage(),
+      nextPage: Page3(),
     );
   }
 }
+
+class Page3 extends ConsumerWidget {
+  const Page3({super.key});
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0), child: Text("Setup colors "));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BasicPage(
+      buttonText: "Next setup reminders",
+      currentPage: currentPage(),
+      nextPage: Page4(),
+    );
+  }
+}
+
+class Page4 extends ConsumerWidget {
+  const Page4({super.key});
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0), child: Text("Setup reminders"));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BasicPage(
+      buttonText: "Continue",
+      currentPage: currentPage(),
+      nextPage: Page5(),
+    );
+  }
+}
+
+class Page5 extends ConsumerWidget {
+  const Page5({super.key});
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0), child: Text("optional features"));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BasicPage(
+      buttonText: "Continue",
+      currentPage: currentPage(),
+      nextPage: Page6(),
+    );
+  }
+}
+
+class Page6 extends ConsumerWidget {
+  const Page6({super.key});
+  Widget currentPage() {
+    return Padding(
+        padding: const EdgeInsets.all(20.0), child: Text("All set!"));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BasicPage(
+      buttonText: "Good luck [demonic wink]",
+      currentPage: currentPage(),
+      nextPage: null,
+    );
+  }
+}
+// class Page2 extends ConsumerWidget {
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return Center(
+//       child: Column(
+//         children: [
+//           Text("Page2"),
+//           ElevatedButton(
+//               onPressed: () {
+//                 // Navigate to Page2
+//                 ref.read(navigationProvider.notifier).push(Page2());
+//                 //TODO how to go back to Page1?
+//               },
+//               child: Text("Continue")),
+//           ElevatedButton(
+//               onPressed: () {
+//                 // Navigate to Page2
+//                 ref.read(navigationProvider.notifier).pop();
+//                 //TODO how to go back to Page1?
+//               },
+//               child: Text("back"))
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 Future<void> beforeRunApp() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -179,7 +256,8 @@ class AppWrap extends ConsumerWidget {
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           textTheme: getTextTheme(preference.fontSize, preference.font)),
-      themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.light),
+      // IDEA only dark mode now will change.
+      themeMode: (preference.darkMode ? ThemeMode.dark : ThemeMode.dark),
       debugShowCheckedModeBanner: false,
       home: widget,
     );
@@ -192,7 +270,8 @@ class AppWrap extends ConsumerWidget {
 // - everything is stored locally.
 
 // 1. Display Today's date + timezone. "Today: "
-// 2. Setup fair end of day. "Tomorrow stars at: "
+// x. Setup colors
+// 2. Setup fair end of day. "Tomorrow stars at: " Make sure to allow alerts
 // 3. Setup remainders. "1 time at timestamp or custom"
 // 4. Would you want to enable other features? Journalling/end of day rating/
 // 5. You can now set tasks for tomorrow.
