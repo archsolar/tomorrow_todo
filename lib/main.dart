@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tomorrow_todo/clock_widget.dart';
 import 'package:tomorrow_todo/components/database.dart';
 import 'package:tomorrow_todo/daily_page.dart';
 import 'package:tomorrow_todo/settings.dart';
@@ -98,41 +97,6 @@ class RuleText extends StatelessWidget {
     );
   }
 }
-
-// class Page2 extends PagesWidget {
-//   Page2({super.key})
-//       : super(
-//           next:
-//               Page2(), // Replace YourWidget with the widget you want to assign
-//           buttonText: "I agree",
-//         );
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return BasicPage(
-//         currentPage: main(context), nextPage: Page3(), buttonText: "continue");
-//   }
-
-//   Widget main(BuildContext context) {
-//     var dateCode = 'HH:mm';
-//     var date = DateFormat(dateCode).format(DateTime.now());
-
-//     return Container(
-//       width: double.infinity,
-//       padding: EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         color: Color.fromARGB(255, 20, 17, 17),
-//         borderRadius: BorderRadius.circular(8),
-//       ),
-//       child: Center(
-//           child: Column(
-//         children: [
-//           RuleText("1 - Current time: $date"),
-//         ],
-//       )),
-//     );
-//   }
-// }
 
 class BasicPage extends ConsumerWidget {
   final Widget currentPage;

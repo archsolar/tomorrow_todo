@@ -71,9 +71,9 @@ class Page1 extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RuleText(
-                          "1 - You need to finish all tasks before the day ends or your app will be disabled."),
+                          "1 - You have to finish at least 1 task before the day ends... or the app will be disabled"),
                       RuleText(
-                          "2 - There needs to be at least one continuous task \nDefault: [add tasks for tomorrow]"),
+                          "2 - Every task needs to be marked as complete before the day ends... or the app will be disabled"),
                       RuleText(
                           "3 - Everything is stored locally, there is no cloud."),
                     ],
@@ -104,7 +104,8 @@ class Page2 extends ConsumerWidget {
             Text("It's currently:"),
             // TODO add this to preferences.
             ClockWidget(),
-            Text("I'm productive until (deadline):"),
+            Text("I'm productive until:"),
+            ClockWidget(),
           ],
         ));
   }
