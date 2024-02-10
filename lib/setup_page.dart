@@ -115,11 +115,13 @@ class Page1 extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RuleText(
-                          "1 - You have to finish at least 1 task before the day ends... or the app will be disabled"),
+                          "1 - You have to finish at least 1 task before the day ends... or you will love a heart."),
                       RuleText(
-                          "2 - Every task needs to be marked as complete before the day ends... or the app will be disabled"),
+                          "2 - Every task needs to be marked as complete before the day ends... or you will lose a heart."),
                       RuleText(
                           "3 - Everything is stored locally, there is no cloud."),
+                      RuleText(
+                          "4 - When 0 hearts remain the app will be disabled."),
                     ],
                   ),
                 ),
@@ -193,17 +195,34 @@ class Page2 extends ConsumerWidget {
   }
 }
 
+// class Page3 extends ConsumerWidget {
+//   const Page3({super.key});
+//   Widget currentPage() {
+//     return Padding(
+//         padding: const EdgeInsets.all(20.0), child: Text("Setup colors "));
+//   }
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return BasicPage(
+//       buttonText: "Next setup reminders",
+//       currentPage: currentPage(),
+//       nextPage: Page4(),
+//     );
+//   }
+// }
+
 class Page3 extends ConsumerWidget {
   const Page3({super.key});
   Widget currentPage() {
     return Padding(
-        padding: const EdgeInsets.all(20.0), child: Text("Setup colors "));
+        padding: const EdgeInsets.all(20.0), child: Text("Setup reminders"));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return BasicPage(
-      buttonText: "Next setup reminders",
+      buttonText: "Continue",
       currentPage: currentPage(),
       nextPage: Page4(),
     );
@@ -214,7 +233,7 @@ class Page4 extends ConsumerWidget {
   const Page4({super.key});
   Widget currentPage() {
     return Padding(
-        padding: const EdgeInsets.all(20.0), child: Text("Setup reminders"));
+        padding: const EdgeInsets.all(20.0), child: Text("Optional features"));
   }
 
   @override
@@ -229,23 +248,6 @@ class Page4 extends ConsumerWidget {
 
 class Page5 extends ConsumerWidget {
   const Page5({super.key});
-  Widget currentPage() {
-    return Padding(
-        padding: const EdgeInsets.all(20.0), child: Text("optional features"));
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return BasicPage(
-      buttonText: "Continue",
-      currentPage: currentPage(),
-      nextPage: Page6(),
-    );
-  }
-}
-
-class Page6 extends ConsumerWidget {
-  const Page6({super.key});
   Widget currentPage() {
     return Padding(
         padding: const EdgeInsets.all(20.0), child: Text("All set!"));
