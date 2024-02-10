@@ -1,24 +1,51 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
-class ClockWidget extends StatefulWidget {
+class ClockWidget extends ConsumerStatefulWidget {
+  final bool switchEnabled;
+  final bool clockEnabled;
+
+  const ClockWidget(
+      {super.key, required this.switchEnabled, required this.clockEnabled});
+
   @override
-  _ClockWidgetState createState() => _ClockWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _ClockWidgetState();
 }
 
-// TODO make this into a provider in preferences?
-bool is24HourFormat = false; // Switch state
+final timeFormatProvider =
+    NotifierProvider<TimeFormatNotifier, bool>(TimeFormatNotifier.new);
 
-class _ClockWidgetState extends State<ClockWidget> {
+class TimeFormatNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    return false;
+  }
+
+  bool toggle() {
+    state = !state;
+    return state;
+  }
+
+  void set(bool value) {
+    state = value;
+  }
+
+  bool get() {
+    return state;
+  }
+}
+
+class _ClockWidgetState extends ConsumerState<ClockWidget> {
   DateTime selectedTime = DateTime.now();
   Timer? _timer;
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    // _startTimer();
   }
 
   @override
@@ -27,49 +54,69 @@ class _ClockWidgetState extends State<ClockWidget> {
     super.dispose();
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-      setState(() {
-        selectedTime = DateTime.now(); // Update the time every minute
-      });
-    });
-  }
+  // void _startTimer() {
+  //   _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+  //     setState(() {
+  //       selectedTime = DateTime.now(); // Update the time every minute
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final timeformat = ref.read(timeFormatProvider.notifier);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            _formattedTime(),
-            style: TextStyle(
-              fontSize: 48, // Adjust the font size as needed
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('24-Hour Format'),
-              Switch(
-                value: is24HourFormat,
-                onChanged: (value) {
-                  setState(() {
-                    is24HourFormat = value;
-                  });
-                },
-              ),
-            ],
-          ),
+          widget.clockEnabled
+              ? TimeDisplay(displayTime: DateTime.now())
+              : Container(),
+          widget.switchEnabled
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('24-Hour Format'),
+                    Switch(
+                      value: ref.watch(timeFormatProvider),
+                      onChanged: (value) {
+                        print("toggles");
+                        ref.read(timeFormatProvider.notifier).state =
+                            value; // Directly set the new state
+                      },
+                    ),
+                  ],
+                )
+              : Container(),
         ],
       ),
     );
   }
+}
 
-  String _formattedTime() {
-    var now = DateTime.now();
+Text bigText(String text) {
+  return Text(
+    text,
+    style: TextStyle(
+      fontSize: 48, // Adjust the font size as needed
+      fontWeight: FontWeight.bold,
+    ),
+  );
+}
+
+class TimeDisplay extends ConsumerWidget {
+  final DateTime displayTime;
+  const TimeDisplay({super.key, required this.displayTime});
+
+  String _formattedTime(DateTime time, bool timeformat) {
     // Format time based on the switch's state
-    return DateFormat(is24HourFormat ? 'HH:mm' : 'hh:mm a').format(now);
+    return DateFormat(timeformat ? 'HH:mm' : 'hh:mm a').format(displayTime);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final timeformat = ref.watch(timeFormatProvider);
+    return bigText(_formattedTime(displayTime, timeformat));
   }
 }

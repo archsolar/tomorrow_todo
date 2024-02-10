@@ -2,8 +2,52 @@
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tomorrow_todo/clock_widget.dart';
-import 'package:tomorrow_todo/main.dart';
+import 'package:todo_game/clock_widget.dart';
+
+class BasicPage extends ConsumerWidget {
+  final Widget currentPage;
+  final ConsumerWidget? nextPage;
+  // final String text;
+  final String buttonText;
+  const BasicPage(
+      {super.key,
+      required this.currentPage,
+      required this.nextPage,
+      required this.buttonText});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        children: [
+          SizedBox(height: 40), // Adjust the spacing as needed
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: currentPage),
+          SizedBox(height: 16), // Adjust the spacing as needed
+          SizedBox(
+            height: 50, // Adjust the height as needed
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO lots of work here
+                if (nextPage == null) {
+                  // Move on to the main page.
+                  // TODO SETUP BASIC TASK.
+                } else {
+                  // TODO how to correctly change this without using the notivier state thing.
+                  final nav =
+                      ref.read(navigationProvider.notifier).push(nextPage!);
+                }
+              },
+              child: Text(buttonText),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class SetupPage extends ConsumerWidget {
   const SetupPage({super.key});
@@ -94,18 +138,47 @@ class Page1 extends ConsumerWidget {
   }
 }
 
+class RuleText extends StatelessWidget {
+  final String text;
+
+  const RuleText(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+}
+
 class Page2 extends ConsumerWidget {
   const Page2({super.key});
   Widget currentPage() {
+    DateTime now = DateTime.now();
+    DateTime midnight = DateTime(now.year, now.month, now.day);
     return Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             Text("It's currently:"),
             // TODO add this to preferences.
-            ClockWidget(),
-            Text("I'm productive until:"),
-            ClockWidget(),
+            ClockWidget(
+              switchEnabled: false,
+              clockEnabled: true,
+            ),
+            Text("The deadline is:"),
+            TimeDisplay(displayTime: midnight),
+            ClockWidget(
+              switchEnabled: true,
+              clockEnabled: false,
+            ),
           ],
         ));
   }

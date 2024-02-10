@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tomorrow_todo/components/database.dart';
+import 'package:todo_game/components/database.dart';
 
 import 'components/stored_structs.dart';
 
@@ -32,9 +32,7 @@ class TaskNotifier extends Notifier<List<Task>> {
     state = await Database.getAllTasks();
   }
 
-  void getFirstTaskDate() {
-    
-  }
+  void getFirstTaskDate() {}
 }
 
 final taskProvider =

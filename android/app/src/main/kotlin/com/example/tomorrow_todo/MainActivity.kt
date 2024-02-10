@@ -1,4 +1,4 @@
-package com.example.tomorrow_todo
+package com.example.todo_game
 
 import io.flutter.embedding.android.FlutterActivity
 

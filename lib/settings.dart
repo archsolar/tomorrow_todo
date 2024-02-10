@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tomorrow_todo/components/database.dart';
-import 'package:tomorrow_todo/components/stored_structs.dart';
+import 'package:todo_game/components/database.dart';
+import 'package:todo_game/components/stored_structs.dart';
 
 late Preference globalPref;
 

@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tomorrow_todo/components/database.dart';
-import 'package:tomorrow_todo/daily_page.dart';
-import 'package:tomorrow_todo/settings.dart';
-import 'package:tomorrow_todo/setup_page.dart';
-import 'package:tomorrow_todo/util.dart';
+import 'package:todo_game/components/database.dart';
+import 'package:todo_game/daily_page.dart';
+import 'package:todo_game/settings.dart';
+import 'package:todo_game/setup_page.dart';
+import 'package:todo_game/util.dart';
 import 'providers.dart';
 
 final isTaskEmpty = StateProvider<bool>((ref) {
@@ -78,67 +78,3 @@ class AppWrap extends ConsumerWidget {
 // 5. You can now set tasks for tomorrow.
 // final widgetProvider = StateProvider<PagesWidget>((ref) => Page1());
 
-class RuleText extends StatelessWidget {
-  final String text;
-
-  const RuleText(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-}
-
-class BasicPage extends ConsumerWidget {
-  final Widget currentPage;
-  final ConsumerWidget? nextPage;
-  // final String text;
-  final String buttonText;
-  const BasicPage(
-      {super.key,
-      required this.currentPage,
-      required this.nextPage,
-      required this.buttonText});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: 40), // Adjust the spacing as needed
-          SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: currentPage),
-          SizedBox(height: 16), // Adjust the spacing as needed
-          SizedBox(
-            height: 50, // Adjust the height as needed
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO lots of work here
-                if (nextPage == null) {
-                  // Move on to the main page.
-                  // TODO SETUP BASIC TASK.
-                } else {
-                  // TODO how to correctly change this without using the notivier state thing.
-                  final nav =
-                      ref.read(navigationProvider.notifier).push(nextPage!);
-                }
-              },
-              child: Text(buttonText),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

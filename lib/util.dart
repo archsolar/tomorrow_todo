@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:tomorrow_todo/components/database.dart';
-import 'package:tomorrow_todo/components/stored_structs.dart';
-import 'package:tomorrow_todo/settings.dart';
+import 'package:todo_game/components/database.dart';
+import 'package:todo_game/components/stored_structs.dart';
+import 'package:todo_game/settings.dart';
 
 TextTheme getTextTheme(double fontSize, String fontFamily) {
   if (fontFamily == fontNames[1]) {

@@ -19,7 +19,7 @@ class Database {
 
     String path = appDir.path;
     if (Platform.isLinux) {
-      path = '${appDir.path}/tomorrow_todo';
+      path = '${appDir.path}/todo_game';
       final customDir = Directory(path);
       // Ensure the directory exists
       if (!await customDir.exists()) {
@@ -28,7 +28,7 @@ class Database {
     }
     // If the operating system is Windows, change the directory
     if (Platform.isWindows) {
-      path = '${appDir.path}\\tomorrow_todo';
+      path = '${appDir.path}\\todo_game';
       final customDir = Directory(path);
 
       // Ensure the directory exists
@@ -94,6 +94,7 @@ class Database {
       }
     });
   }
+
   // P R E F E R E N C E
   // Either returns preference or null if it fails to fetch.
   static Future<Preference?> tryGetPreferences() async {
