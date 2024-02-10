@@ -45,7 +45,7 @@ class _ClockWidgetState extends ConsumerState<ClockWidget> {
   @override
   void initState() {
     super.initState();
-    // _startTimer();
+    _startTimer();
   }
 
   @override
@@ -54,13 +54,14 @@ class _ClockWidgetState extends ConsumerState<ClockWidget> {
     super.dispose();
   }
 
-  // void _startTimer() {
-  //   _timer = Timer.periodic(Duration(minutes: 1), (timer) {
-  //     setState(() {
-  //       selectedTime = DateTime.now(); // Update the time every minute
-  //     });
-  //   });
-  // }
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        print("A");
+        selectedTime = DateTime.now(); // Update the time every minute
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,7 @@ class _ClockWidgetState extends ConsumerState<ClockWidget> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           widget.clockEnabled
-              ? TimeDisplay(displayTime: DateTime.now())
+              ? TimeDisplay(displayTime: selectedTime)
               : Container(),
           widget.switchEnabled
               ? Row(
