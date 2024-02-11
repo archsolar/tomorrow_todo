@@ -15,6 +15,7 @@ final isTaskEmpty = StateProvider<bool>((ref) {
 
 Future<void> main() async {
   await beforeRunApp();
+  NotificationService().init();
   runApp(ProviderScope(
     child: AppWrap(StartupWidget() /* SetupParent() */),
   ));
