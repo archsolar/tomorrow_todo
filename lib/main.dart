@@ -3,11 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:todo_game/components/database.dart';
+import 'package:todo_game/components/notifications.dart';
 import 'package:todo_game/pages/daily_page.dart';
 import 'package:todo_game/pages/settings.dart';
 import 'package:todo_game/pages/setup_page.dart';
 import 'package:todo_game/components/util.dart';
 import 'components/providers.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final isTaskEmpty = StateProvider<bool>((ref) {
   return tasks.isEmpty;
@@ -16,8 +19,11 @@ final isTaskEmpty = StateProvider<bool>((ref) {
 Future<void> main() async {
   await beforeRunApp();
   NotificationService().init();
+  //TODO what if someone changes timezone?
+  tz.initializeTimeZones();
+
   runApp(ProviderScope(
-    child: AppWrap(StartupWidget() /* SetupParent() */),
+    child: AppWrap(StartupWidget()),
   ));
 }
 
@@ -78,4 +84,3 @@ class AppWrap extends ConsumerWidget {
 // 4. Would you want to enable other features? Journalling/end of day rating/
 // 5. You can now set tasks for tomorrow.
 // final widgetProvider = StateProvider<PagesWidget>((ref) => Page1());
-

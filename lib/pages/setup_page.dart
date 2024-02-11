@@ -1,12 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:todo_game/components/clock_widget.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+import 'package:todo_game/components/notifications.dart';
 
 class BasicPage extends ConsumerWidget {
   final Widget currentPage;
@@ -34,13 +31,11 @@ class BasicPage extends ConsumerWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                NotificationService().showTaskFinishNotification();
-                // TODO lots of work here
+                //TODO at alarm time.
                 if (nextPage == null) {
                   // Move on to the main page.
                   // TODO SETUP BASIC TASK.
                 } else {
-                  // TODO how to correctly change this without using the notivier state thing.
                   final nav =
                       ref.read(navigationProvider.notifier).push(nextPage!);
                 }
@@ -264,56 +259,6 @@ class Page5 extends ConsumerWidget {
       buttonText: "Good luck [demonic wink]",
       currentPage: currentPage(),
       nextPage: null,
-    );
-  }
-}
-
-////
-///
-////
-
-class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  Future<void> init() async {
-    final AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
-    );
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-      macOS: null,
-    );
-
-    tz.initializeTimeZones();
-
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-    );
-  }
-
-  Future<void> showTaskFinishNotification() async {
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'task_finish_channel_id', 'Task Finish Channel',
-        importance: Importance.max, priority: Priority.high, showWhen: false);
-    const iOSPlatformChannelSpecifics = DarwinNotificationDetails();
-    const platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Task Reminder',
-      'Time to finish a task!',
-      platformChannelSpecifics,
     );
   }
 }
