@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:todo_game/components/database.dart';
 import 'package:todo_game/components/stored_structs.dart';
-import 'package:todo_game/settings.dart';
+import 'package:todo_game/pages/settings.dart';
 
 TextTheme getTextTheme(double fontSize, String fontFamily) {
   if (fontFamily == fontNames[1]) {

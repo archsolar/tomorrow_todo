@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_game/components/stored_structs.dart';
-import 'package:todo_game/providers.dart';
-import 'package:todo_game/settings.dart';
+import 'package:todo_game/components/providers.dart';
+import 'package:todo_game/pages/settings.dart';
 
 var dateCode = 'dd-MM';
 

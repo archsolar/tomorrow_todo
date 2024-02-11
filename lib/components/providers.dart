@@ -3,7 +3,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:todo_game/components/database.dart';
 
-import 'components/stored_structs.dart';
+import 'stored_structs.dart';
 
 late List<Task> tasks;
 

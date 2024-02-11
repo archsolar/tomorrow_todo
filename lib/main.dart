@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:todo_game/components/database.dart';
-import 'package:todo_game/daily_page.dart';
-import 'package:todo_game/settings.dart';
-import 'package:todo_game/setup_page.dart';
-import 'package:todo_game/util.dart';
-import 'providers.dart';
+import 'package:todo_game/pages/daily_page.dart';
+import 'package:todo_game/pages/settings.dart';
+import 'package:todo_game/pages/setup_page.dart';
+import 'package:todo_game/components/util.dart';
+import 'components/providers.dart';
 
 final isTaskEmpty = StateProvider<bool>((ref) {
   return tasks.isEmpty;

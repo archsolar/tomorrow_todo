@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:todo_game/clock_widget.dart';
+import 'package:todo_game/components/clock_widget.dart';
 
 class BasicPage extends ConsumerWidget {
   final Widget currentPage;
