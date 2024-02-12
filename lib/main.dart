@@ -9,8 +9,6 @@ import 'package:todo_game/pages/settings.dart';
 import 'package:todo_game/pages/setup_page.dart';
 import 'package:todo_game/components/util.dart';
 import 'components/providers.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 final isTaskEmpty = StateProvider<bool>((ref) {
   return tasks.isEmpty;
@@ -18,10 +16,8 @@ final isTaskEmpty = StateProvider<bool>((ref) {
 
 Future<void> main() async {
   await beforeRunApp();
-  NotificationService().init();
-  //TODO what if someone changes timezone?
-  tz.initializeTimeZones();
-
+  // TODO this needs to be moved.
+  await NotificationService.init();
   runApp(ProviderScope(
     child: AppWrap(StartupWidget()),
   ));
