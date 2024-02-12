@@ -1,6 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_key_in_widget_constructors
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:todo_game/components/clock_widget.dart';
 import 'package:todo_game/components/notifications.dart';
@@ -55,7 +58,22 @@ class SetupPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentPageWidget = ref.watch(navigationProvider);
-    return Scaffold(body: currentPageWidget.last);
+    return Scaffold(
+        body: PopScope(
+      child: currentPageWidget.last,
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        print("POP!");
+        if (didPop) {
+          return;
+        }
+        final popped = ref.read(navigationProvider.notifier).pop();
+        if (!popped) {
+          // Exit app as there's nothing to pop
+          SystemNavigator.pop();
+        }
+      },
+    ));
   }
 }
 
@@ -195,28 +213,103 @@ class Page2 extends ConsumerWidget {
   }
 }
 
-// class Page3 extends ConsumerWidget {
-//   const Page3({super.key});
-//   Widget currentPage() {
-//     return Padding(
-//         padding: const EdgeInsets.all(20.0), child: Text("Setup colors "));
-//   }
+class ConfigurableAlertsPage extends StatefulWidget {
+  @override
+  _ConfigurableAlertsPageState createState() => _ConfigurableAlertsPageState();
+}
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return BasicPage(
-//       buttonText: "Next setup reminders",
-//       currentPage: currentPage(),
-//       nextPage: Page4(),
-//     );
-//   }
-// }
+class _ConfigurableAlertsPageState extends State<ConfigurableAlertsPage> {
+  // List to hold the times for the alerts
+  List<TimeOfDay> alerts = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Configure Alerts"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Setup reminders",
+                style: Theme.of(context).textTheme.headline6),
+            Expanded(
+              child: ListView.builder(
+                itemCount: alerts.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(
+                        "Alert ${index + 1}: ${alerts[index].format(context)}"),
+                    trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () async {
+                          _removeAlert(index);
+                        }),
+                  );
+                },
+              ),
+            ),
+            ElevatedButton(
+              onPressed: alerts.length < 4
+                  ? () async {
+                      bool permissionGranted =
+                          await requestExactAlarmPermission();
+                      if (permissionGranted) {
+                        _addNewAlert();
+                      } else {
+                        // Handle permission not granted
+                        print("Permission not granted");
+                      }
+                    }
+                  : null, // Disable button if 4 alerts have been added
+              child: Text('Add Alert'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _removeAlert(int index) {
+    alerts.removeAt(index);
+    refreshAlerts().then((value) => setState(() {}));
+  }
+
+  Future<void> _addNewAlert() async {
+    final TimeOfDay? newTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (newTime != null) {
+      alerts.add(newTime);
+      refreshAlerts().then((value) => setState(() {}));
+    }
+  }
+
+  Future<void> refreshAlerts() async {
+    await NotificationService.cancelAll();
+    for (int i = 0; i < alerts.length; i++) {
+      await NotificationService.addFinishTaskNotification(
+          alerts[i].hour, alerts[i].minute, i);
+    }
+  }
+}
 
 class Page3 extends ConsumerWidget {
   const Page3({super.key});
   Widget currentPage() {
     return Padding(
-        padding: const EdgeInsets.all(20.0), child: Text("Setup reminders"));
+        padding: const EdgeInsets.all(20.0),
+
+        //TODO fix has infinite height.
+        child: Column(
+          children: [
+            Text("Setup reminders"),
+            Expanded(child: ConfigurableAlertsPage()),
+          ],
+        ));
   }
 
   @override
